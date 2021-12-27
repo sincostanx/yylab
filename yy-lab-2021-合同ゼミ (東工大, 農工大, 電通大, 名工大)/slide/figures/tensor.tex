@@ -1,0 +1,47 @@
+\documentclass[preview]{standalone}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,3d,positioning}
+\usepackage{import}
+\subimport{layers}{init}
+
+\pgfmathsetseed{42}
+
+\begin{document}
+\begin{figure}
+    \centering
+    \resizebox{1.0\columnwidth}{!}{
+        \begin{tikzpicture}
+        
+        \pic[shift={(0,0,0)}] at (0,0,0)
+            {NoDotBox={
+                name=1-0,
+                caption=,
+                fill=gray,
+                height=1,
+                width=12,
+                depth=16
+                }
+            };
+        
+        \foreach \layer in {1,...,14}{
+            \pgfmathtruncatemacro{\prevlayer}{\layer -1}
+            \pgfmathparse{int(random(1,99))/100}
+            \definecolor{RandomColor}{rgb}{\pgfmathresult,\pgfmathresult,\pgfmathresult}
+            \pic[shift={(-0.04,0.17,1.5)}] at (1-\prevlayer-farwest) 
+            % \pic[shift={(,-0.25,2.5)}] at (\prevlayer-fareast) 
+                {NoDotBox={
+                    name=1-\layer,
+                    caption=,
+                    fill=RandomColor,
+                    height=1,
+                    width=12,
+                    depth=16
+                    }
+                };
+        }
+        
+        \end{tikzpicture}
+        }
+\end{figure}
+\end{document}

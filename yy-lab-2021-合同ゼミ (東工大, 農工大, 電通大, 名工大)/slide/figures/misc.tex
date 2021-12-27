@@ -1,0 +1,123 @@
+\documentclass[../main.tex]{subfiles}
+\graphicspath{{\subfix{../figures/}}}
+
+\pgfmathsetseed{42}
+
+\pgfmathdeclarerandomlist{ColorList}{%
+    % {red}%
+    % {red!50}%
+    % {magenta}%
+    {magenta!60}%
+    % {olive}%
+    % {olive!50}%
+    % {brown}%
+    {brown!60}%
+    % {violet}%
+    {violet!60}%
+    % {gray}%
+    % {purple}%
+    % {yellow}%
+    % {orange}%
+    {orange!60}%
+    {cyan!60}%
+    {green!60}%    
+}%
+
+\begin{document}
+\begin{figure}
+    \centering
+    \resizebox{1.0\columnwidth}{!}{
+        \begin{tikzpicture}
+        
+        \pic[shift={(0,0,0)}] at (0,0,0)
+            {NoDotBox={
+                name=1-0,
+                caption=,
+                fill=gray,
+                height=1,
+                width=12,
+                depth=16
+                }
+            };
+        
+        \foreach \layer in {1,...,14}{
+            \pgfmathtruncatemacro{\prevlayer}{\layer -1}
+            \pgfmathparse{int(random(1,99))/100}
+            \definecolor{RandomColor}{rgb}{\pgfmathresult,\pgfmathresult,\pgfmathresult}
+            \pic[shift={(-0.04,0.17,1.5)}] at (1-\prevlayer-farwest) 
+            % \pic[shift={(,-0.25,2.5)}] at (\prevlayer-fareast) 
+                {NoDotBox={
+                    name=1-\layer,
+                    caption=,
+                    fill=RandomColor,
+                    height=1,
+                    width=12,
+                    depth=16
+                    }
+                };
+        }
+        
+        % \foreach \layer/\colorfill in {10/blue,11/green,12/red}{
+        %     \pgfmathtruncatemacro{\prevlayer}{\layer -1}
+        %     \pic[shift={(-0.04,0.17,1.5)}] at (\prevlayer-farwest) 
+        %         {NoDotBox={
+        %             name=\layer,
+        %             caption=,
+        %             fill=\colorfill!80,
+        %             height=1,
+        %             width=12,
+        %             depth=16
+        %             }
+        %         };
+        % }
+        
+        \pgfmathrandomitem{\RandomColor}{ColorList}
+        \pic[shift={(3,0,0)}] at (1-0-east)
+            {NoDotBox={
+                name=2-0,
+                caption=,
+                fill=\RandomColor,
+                height=1,
+                width=12,
+                depth=16
+                }
+            };
+        
+        \foreach \layer in {1,...,14}{
+            \pgfmathtruncatemacro{\prevlayer}{\layer -1}
+            \pgfmathrandomitem{\RandomColor}{ColorList}
+            \pic[shift={(-0.04,0.17,1.5)}] at (2-\prevlayer-farwest) 
+            % \pic[shift={(,-0.25,2.5)}] at (\prevlayer-fareast) 
+                {NoDotBox={
+                    name=2-\layer,
+                    caption=,
+                    fill=\RandomColor,
+                    height=1,
+                    width=12,
+                    depth=16
+                    }
+                };
+        }
+        
+        % \foreach \layer/\colorfill in {10/blue,11/green,12/red}{
+        %     \pgfmathtruncatemacro{\prevlayer}{\layer -1}
+        %     \pic[shift={(-0.04,0.17,1.5)}] at (2-\prevlayer-farwest) 
+        %         {NoDotBox={
+        %             name=2-\layer,
+        %             caption=,
+        %             fill=\colorfill!80,
+        %             height=1,
+        %             width=12,
+        %             depth=16
+        %             }
+        %         };
+        % }
+        
+        \path (1-7-east) -- (2-7-west) node[midway,fill=none,draw=none] {
+        \includegraphics[width=.05\textwidth]{figures/times.png}
+        };
+        
+        \end{tikzpicture}
+        }
+\end{figure}
+\end{document}

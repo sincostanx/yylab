@@ -1,0 +1,77 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\usepackage{multirow}
+\usepackage{relsize}
+\usepackage{subfiles}
+
+\begin{document}
+
+\title{\LARGE Supervised Monocular Depth Estimation via Stacked Generalization}
+
+\author{\IEEEauthorblockN{Chinchuthakun Worameth}
+\IEEEauthorblockA{\textit{Department of Transdisciplinary Science and Engineering} \\
+\textit{Tokyo Institute of Technology}}
+}
+
+\maketitle
+
+\section{Introduction}
+Monocular depth estimation has been extensively studied because it offers relatively low computational cost and energy consumption compared to stereo depth estimation. Despite its ill-posed nature, deep learning has rapidly advanced the progress in this task and continuously presented state-of-the-art results by exploring novel network architectures.
+
+This paper studies a stacked generalization (SG) framework in monocular depth estimation. Several state-of-the-arts architectures \cite{adabins, bts, lapdepth} were adopted as base learners with some adjustments. An additional encoder-decoder network was employed as the meta-learner and trained to combine the predicted depth maps. This work demonstrates a successful application of SG in supervised monocular depth estimation on NYU Depth V2 dataset \cite{nyu}, achieving better performance on standard evaluation metrics. Ablation studies also serve as guidelines on how to effectively adopt this framework.
+
+\section{Related Works}
+\textbf{Supervised Monocular Depth Estimation} usually leverages deep learning. Previous works have introduced many architectures based on CNN and Visual Transformer. Other strategies have also been explored, including multi-tasking, domain adaptation, and lightweight network for fast inference.
+
+\textbf{Ensemble deep learning} refers to approaches that infer a final prediction from multiple neural networks. This research focuses on stacked generalization, which linearly combines predictions from base learners. The optimal weight combination is learned with a neural network, producing a pixel-wise coefficient tensor as an output. While it has been adopted in many tasks, there is no application in monocular depth estimation according to a recent survey. 
+
+
+
+\section{Methodology}
+\subsection{Modifications of base learners}
+To cope with hardware's limitations and accelerate experimentation, models' size and latency were reduced by
+\begin{enumerate}
+    \item Employing \textit{GhostNet} as the encoder for all architectures.
+    \item Replacing convolution with \textit{depthwise separable convolution} in \cite{adabins} and \cite{bts} except for atrous convolution layers.
+    \item Interpolating \textit{after} convolution instead of before in \cite{adabins}.
+\end{enumerate}
+
+\subsection{Design choices of meta-learner}
+Four design aspects were considered in ablation studies, viz.
+\begin{enumerate}
+    \item \textbf{Training pipeline}: train base learners and controller (1) simultaneously or (2) sequentially.
+    \item \textbf{Transfer learning}: when training a meta-learner, (1) freeze base learners' parameters or (2) fine-tune them.
+    \item \textbf{Available input}: when training a meta-learner, specify its input as (1) raw RGB image; (2) predictions from base learners; or (3) both of them.
+    \item \textbf{Backbone architecture}: feature maps are extracted with (1) GhostNet, (2) MobileNetV2, or (3) DenseNet-161.
+\end{enumerate}
+
+\subsection{Loss functions}
+Inspired from \cite{adabins}, Pixel-wise depth loss was employed in \cite{adabins, bts, lapdepth}. Bichamfer loss was also utilized in \cite{adabins} to encourage the distribution of bin centers to follow the ground truth.
+
+% Inspired from \cite{adabins}, \textit{Pixel-wise depth loss} was employed in all architectures. \textit{Bichamfer loss} was additionally utilized in the base learner based on \cite{adabins} to encourage the distribution of bin centers to follow the distribution of in the ground truth.
+
+\section{Experiment}
+% \subsection{Implementation}
+Models were implemented in PyTorch and trained on 10 GTX 1080 Ti GPUs via distributed learning. Data augmentations, described in \cite{adabins}, were used to avoid overfitting. Evaluations on standard metrics were conducted with the official split of NYU Depth V2 dataset. Performance of base learners and ensembles are shown in Tables below, respectively.
+
+% Hyperparameters are listed in Table x.
+
+\subfile{./tables/baselearner}
+\vspace{-0.4cm}
+\subfile{./tables/metalearner}
+
+\bibliographystyle{IEEEtran}
+\nocite{*}
+\bibliography{references}
+
+\end{document}
